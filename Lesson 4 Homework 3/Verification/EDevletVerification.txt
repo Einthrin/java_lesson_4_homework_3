@@ -1,0 +1,12 @@
+package Verification;
+
+import java.time.LocalDate;
+
+public class EDevletVerification implements UserVerification
+{
+    @Override
+    public boolean verificateUserInformation(String nationalityId, String name, String surname, LocalDate birthdate)
+    {
+        return nationalityId.length() == 11 && !name.matches("") && !surname.matches("");
+    }
+}

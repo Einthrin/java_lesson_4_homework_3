@@ -1,0 +1,76 @@
+package User;
+
+import Database.Database;
+import Logger.Logger;
+import Verification.UserVerification;
+import java.time.LocalDate;
+import Utils.Utils;
+
+public class UserManager
+{
+    private final Database db;
+    private final Logger[] loggers;
+    private final UserVerification userVerification;
+
+    public UserManager(Database database, Logger[] loggers, UserVerification userVerification)
+    {
+        this.db = database;
+        this.loggers = loggers;
+        this.userVerification = userVerification;
+    }
+
+    public User create(Long id, String username, String password, String nationalityId, String name, String surname, LocalDate birthDate)
+    {
+        try
+        {
+            if(userVerification.verificateUserInformation(nationalityId, name, surname, birthDate))
+            {
+                User user = new User(id, username, password, nationalityId, name, surname, birthDate);
+                db.insertToUsers(user);
+
+                Utils.runLoggers(loggers, user, "Kayıt Tarihi : ", LocalDate.now());
+                return user;
+            }
+            else
+                return null;
+        }
+        catch(Exception ex)
+        {
+            Utils.logErrors(loggers, "Kayıt İstisnası : " + ex.getMessage(), LocalDate.now());
+            return null;
+        }
+    }
+
+    public void update(User user, String username, String password, String nationalityId, String name, String surName, LocalDate birthDate)
+    {
+        try
+        {
+            user.setUsername(username);
+            user.setPassword(password);
+            user.setNationalityId(nationalityId);
+            user.setName(name);
+            user.setSurName(surName);
+            user.setBirthDate(birthDate);
+            db.updateUser(user);
+
+            Utils.runLoggers(loggers, user, "Güncelleme Tarihi : ", LocalDate.now());
+        }
+        catch (Exception ex)
+        {
+            Utils.logErrors(loggers, "Güncelleme İstisnası : " + ex.getMessage(), LocalDate.now());
+        }
+    }
+
+    public void delete(User user)
+    {
+        try
+        {
+            db.deleteFromUsers(user.getId());
+
+            Utils.runLoggers(loggers, user, "Silme Tarihi : ", LocalDate.now());
+        }
+        catch(Exception ex) {
+            Utils.logErrors(loggers, "Silme İstisnası : " + ex.getMessage(), LocalDate.now());
+        }
+    }
+}

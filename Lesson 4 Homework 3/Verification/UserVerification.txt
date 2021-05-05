@@ -1,0 +1,8 @@
+package Verification;
+
+import java.time.LocalDate;
+
+public interface UserVerification
+{
+    boolean verificateUserInformation(String nationalityId, String name, String surname, LocalDate birthdate);
+}
